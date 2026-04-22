@@ -6,107 +6,8 @@
   <title>Sea Wave Simulator</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-
-    body {
-      overflow: hidden;
-      height: 100vh;
-      font-family: 'Segoe UI', sans-serif;
-      transition: background 1.5s ease;
-    }
-
-    .sky {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 55%;
-      transition: background 1.5s ease;
-    }
-
-    .sun-moon {
-      position: absolute;
-      width: 80px;
-      height: 80px;
-      border-radius: 50%;
-      top: 12%;
-      left: 50%;
-      transform: translateX(-50%);
-      transition: background 1.5s ease, box-shadow 1.5s ease;
-    }
-
-    .stars {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 55%;
-      transition: opacity 1.5s ease;
-      pointer-events: none;
-    }
-
-    .star {
-      position: absolute;
-      background: #fff;
-      border-radius: 50%;
-      animation: twinkle 2s ease-in-out infinite alternate;
-    }
-
-    @keyframes twinkle {
-      from { opacity: 0.3; }
-      to { opacity: 1; }
-    }
-
-    .ocean {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 55%;
-      overflow: hidden;
-      transition: background 1.5s ease;
-    }
-
-    .wave {
-      position: absolute;
-      width: 200%;
-      left: -50%;
-      transition: background 1.5s ease;
-    }
-
-    .wave-back {
-      bottom: 10%;
-      height: 60%;
-      opacity: 0.6;
-      animation: wave-move-back linear infinite;
-    }
-
-    .wave-mid {
-      bottom: 5%;
-      height: 55%;
-      opacity: 0.8;
-      animation: wave-move-mid linear infinite;
-    }
-
-    .wave-front {
-      bottom: 0;
-      height: 50%;
-      animation: wave-move-front linear infinite;
-    }
-
-    @keyframes wave-move-back {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(25%); }
-    }
-
-    @keyframes wave-move-mid {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-25%); }
-    }
-
-    @keyframes wave-move-front {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(25%); }
-    }
+    body { overflow: hidden; height: 100vh; font-family: 'Segoe UI', sans-serif; background: #000; }
+    canvas { display: block; width: 100vw; height: 100vh; }
 
     .controls {
       position: fixed;
@@ -117,89 +18,46 @@
       backdrop-filter: blur(12px);
       z-index: 10;
       min-width: 240px;
-      transition: background 1.5s ease, color 1.5s ease;
+      background: rgba(0,0,0,0.25);
+      color: #ecf0f1;
     }
 
-    .controls h2 {
-      font-size: 16px;
-      margin-bottom: 16px;
-      letter-spacing: 0.5px;
-    }
-
-    .control-group {
-      margin-bottom: 14px;
-    }
-
+    .controls h2 { font-size: 16px; margin-bottom: 16px; letter-spacing: 0.5px; }
+    .control-group { margin-bottom: 14px; }
     .control-group label {
-      display: flex;
-      justify-content: space-between;
-      font-size: 13px;
-      margin-bottom: 6px;
-      font-weight: 500;
+      display: flex; justify-content: space-between;
+      font-size: 13px; margin-bottom: 6px; font-weight: 500;
     }
-
-    .control-group label span {
-      opacity: 0.7;
-      font-weight: 400;
-    }
+    .control-group label span { opacity: 0.7; font-weight: 400; }
 
     input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      outline: none;
-      cursor: pointer;
-      transition: background 0.3s;
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 6px; border-radius: 3px; outline: none; cursor: pointer;
     }
-
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 18px;
-      height: 18px;
-      border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
-      cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,0.3); cursor: pointer;
     }
 
     .speed-slider { background: linear-gradient(90deg, #74b9ff, #0984e3); }
-    .daytime-slider { background: linear-gradient(90deg, #2d3436, #fdcb6e, #0984e3); }
+    .daytime-slider { background: linear-gradient(90deg, #2d3436, #fdcb6e, #74b9ff); }
     .wavelength-slider { background: linear-gradient(90deg, #55efc4, #00b894); }
   </style>
 </head>
 <body>
-
-  <div class="sky" id="sky">
-    <div class="sun-moon" id="sunMoon"></div>
-    <div class="stars" id="stars"></div>
-  </div>
-
-  <div class="ocean" id="ocean">
-    <svg class="wave wave-back" id="waveBack" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path id="pathBack" fill="currentColor"></path>
-    </svg>
-    <svg class="wave wave-mid" id="waveMid" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path id="pathMid" fill="currentColor"></path>
-    </svg>
-    <svg class="wave wave-front" id="waveFront" viewBox="0 0 1440 320" preserveAspectRatio="none">
-      <path id="pathFront" fill="currentColor"></path>
-    </svg>
-  </div>
+  <canvas id="canvas"></canvas>
 
   <div class="controls" id="controls">
     <h2>Wave Controls</h2>
-
     <div class="control-group">
       <label>Speed <span id="speedVal">5</span></label>
       <input type="range" class="speed-slider" id="speed" min="1" max="10" value="5">
     </div>
-
     <div class="control-group">
       <label>Daytime <span id="daytimeVal">75%</span></label>
       <input type="range" class="daytime-slider" id="daytime" min="0" max="100" value="75">
     </div>
-
     <div class="control-group">
       <label>Wavelength <span id="wavelengthVal">5</span></label>
       <input type="range" class="wavelength-slider" id="wavelength" min="2" max="12" value="5">
@@ -207,166 +65,254 @@
   </div>
 
   <script>
-    const speedInput = document.getElementById('speed');
-    const daytimeInput = document.getElementById('daytime');
-    const wavelengthInput = document.getElementById('wavelength');
-    const speedVal = document.getElementById('speedVal');
-    const daytimeVal = document.getElementById('daytimeVal');
-    const wavelengthVal = document.getElementById('wavelengthVal');
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
 
-    const sky = document.getElementById('sky');
-    const ocean = document.getElementById('ocean');
-    const sunMoon = document.getElementById('sunMoon');
-    const starsEl = document.getElementById('stars');
-    const controls = document.getElementById('controls');
-
-    const waveBack = document.getElementById('waveBack');
-    const waveMid = document.getElementById('waveMid');
-    const waveFront = document.getElementById('waveFront');
-
-    // Generate stars
-    for (let i = 0; i < 60; i++) {
-      const star = document.createElement('div');
-      star.className = 'star';
-      const size = Math.random() * 3 + 1;
-      star.style.width = size + 'px';
-      star.style.height = size + 'px';
-      star.style.left = Math.random() * 100 + '%';
-      star.style.top = Math.random() * 100 + '%';
-      star.style.animationDelay = Math.random() * 2 + 's';
-      starsEl.appendChild(star);
+    let W, H, horizonY;
+    function resize() {
+      W = canvas.width = window.innerWidth;
+      H = canvas.height = window.innerHeight;
+      horizonY = H * 0.40;
     }
+    resize();
+    window.addEventListener('resize', resize);
 
-    function generateWavePath(peaks) {
-      const segmentWidth = 1440 / peaks;
-      let d = 'M0,160';
-      for (let i = 0; i < peaks * 2; i++) {
-        const x = (i + 1) * (segmentWidth / 2);
-        const amp = 40 + Math.random() * 20;
-        const y = i % 2 === 0 ? 160 - amp : 160 + amp * 0.6;
-        const cpx = x - segmentWidth / 4;
-        const cpy = y;
-        d += ` Q${cpx},${cpy} ${x},${y}`;
+    function lerp(a, b, t) { return a + (b - a) * t; }
+    function lerpC(a, b, t) { return [lerp(a[0],b[0],t), lerp(a[1],b[1],t), lerp(a[2],b[2],t)]; }
+    function rgb(c) { return `rgb(${c[0]|0},${c[1]|0},${c[2]|0})`; }
+    function rgba(c, a) { return `rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`; }
+
+    const palette = {
+      night:  { skyTop:[8,10,28], skyBot:[18,22,50], sunCol:[200,210,230], sunGlow:[80,90,120],
+                water:[ [18,28,60],[14,22,52],[10,18,45],[8,14,38],[6,10,30] ],
+                foam:[80,100,140], spec:[140,160,200] },
+      sunset: { skyTop:[50,20,70], skyBot:[255,110,50], sunCol:[255,130,30], sunGlow:[255,80,20],
+                water:[ [60,50,80],[50,42,72],[42,36,64],[35,30,55],[28,24,46] ],
+                foam:[200,160,130], spec:[255,190,110] },
+      day:    { skyTop:[65,155,255], skyBot:[155,210,255], sunCol:[255,250,150], sunGlow:[255,230,100],
+                water:[ [30,130,210],[22,110,195],[16,90,175],[10,72,155],[6,55,130] ],
+                foam:[220,240,255], spec:[255,255,245] },
+    };
+
+    function getTheme(t) {
+      const r = {};
+      const keys = ['skyTop','skyBot','sunCol','sunGlow','foam','spec'];
+      for (const k of keys) {
+        if (t < 0.35) r[k] = lerpC(palette.night[k], palette.sunset[k], t / 0.35);
+        else r[k] = lerpC(palette.sunset[k], palette.day[k], (t - 0.35) / 0.65);
       }
-      d += ' L1440,320 L0,320 Z';
-      return d;
-    }
-
-    function updateWaves() {
-      const wl = parseInt(wavelengthInput.value);
-      const peaks = 14 - wl + 2;
-      document.getElementById('pathBack').setAttribute('d', generateWavePath(peaks));
-      document.getElementById('pathMid').setAttribute('d', generateWavePath(peaks));
-      document.getElementById('pathFront').setAttribute('d', generateWavePath(peaks));
-    }
-
-    function updateSpeed() {
-      const speed = parseInt(speedInput.value);
-      const duration = 12 - speed + 1;
-      waveBack.style.animationDuration = (duration * 1.3) + 's';
-      waveMid.style.animationDuration = duration + 's';
-      waveFront.style.animationDuration = (duration * 0.8) + 's';
-      speedVal.textContent = speed;
-    }
-
-    function lerp(a, b, t) {
-      return a + (b - a) * t;
-    }
-
-    function lerpColor(c1, c2, t) {
-      return [
-        Math.round(lerp(c1[0], c2[0], t)),
-        Math.round(lerp(c1[1], c2[1], t)),
-        Math.round(lerp(c1[2], c2[2], t))
-      ];
-    }
-
-    function rgb(c) { return `rgb(${c[0]},${c[1]},${c[2]})`; }
-
-    function updateDaytime() {
-      const val = parseInt(daytimeInput.value);
-      daytimeVal.textContent = val + '%';
-
-      // 0 = midnight, 50 = sunrise/sunset, 100 = noon
-      const t = val / 100;
-
-      const nightSky = [15, 20, 40];
-      const sunsetSky = [255, 118, 67];
-      const daySky = [116, 185, 255];
-
-      const nightOcean = [10, 15, 45];
-      const sunsetOcean = [44, 62, 80];
-      const dayOcean = [9, 132, 227];
-
-      const nightWaveBack = [20, 30, 70];
-      const sunsetWaveBack = [60, 80, 100];
-      const dayWaveBack = [30, 144, 255];
-
-      const nightWaveMid = [15, 25, 65];
-      const sunsetWaveMid = [50, 70, 95];
-      const dayWaveMid = [20, 120, 220];
-
-      const nightWaveFront = [10, 20, 55];
-      const sunsetWaveFront = [40, 60, 85];
-      const dayWaveFront = [14, 100, 200];
-
-      let skyColor, oceanColor, wbColor, wmColor, wfColor;
-
-      if (t < 0.35) {
-        const p = t / 0.35;
-        skyColor = lerpColor(nightSky, sunsetSky, p);
-        oceanColor = lerpColor(nightOcean, sunsetOcean, p);
-        wbColor = lerpColor(nightWaveBack, sunsetWaveBack, p);
-        wmColor = lerpColor(nightWaveMid, sunsetWaveMid, p);
-        wfColor = lerpColor(nightWaveFront, sunsetWaveFront, p);
-      } else {
-        const p = (t - 0.35) / 0.65;
-        skyColor = lerpColor(sunsetSky, daySky, p);
-        oceanColor = lerpColor(sunsetOcean, dayOcean, p);
-        wbColor = lerpColor(sunsetWaveBack, dayWaveBack, p);
-        wmColor = lerpColor(sunsetWaveMid, dayWaveMid, p);
-        wfColor = lerpColor(sunsetWaveFront, dayWaveFront, p);
+      r.water = [];
+      for (let i = 0; i < 5; i++) {
+        if (t < 0.35) r.water[i] = lerpC(palette.night.water[i], palette.sunset.water[i], t / 0.35);
+        else r.water[i] = lerpC(palette.sunset.water[i], palette.day.water[i], (t - 0.35) / 0.65);
       }
+      return r;
+    }
 
-      sky.style.background = `linear-gradient(180deg, ${rgb(skyColor)}, ${rgb(lerpColor(skyColor, oceanColor, 0.3))})`;
-      ocean.style.background = rgb(oceanColor);
+    // Stars
+    const stars = [];
+    for (let i = 0; i < 100; i++) {
+      stars.push({ x: Math.random(), y: Math.random() * 0.40, s: Math.random() * 2 + 0.5, p: Math.random() * 6.28 });
+    }
 
-      waveBack.style.color = rgb(wbColor);
-      waveMid.style.color = rgb(wmColor);
-      waveFront.style.color = rgb(wfColor);
+    // Wave layers config (back to front)
+    const layers = [
+      { yBase: 0.00, amp: 14, freqMul: 1.0,  speedMul: 0.5,  colorIdx: 0 },
+      { yBase: 0.12, amp: 18, freqMul: 0.9,  speedMul: 0.65, colorIdx: 1 },
+      { yBase: 0.26, amp: 22, freqMul: 0.85, speedMul: 0.8,  colorIdx: 1 },
+      { yBase: 0.40, amp: 26, freqMul: 0.8,  speedMul: 0.9,  colorIdx: 2 },
+      { yBase: 0.52, amp: 30, freqMul: 0.75, speedMul: 1.0,  colorIdx: 2 },
+      { yBase: 0.63, amp: 34, freqMul: 0.7,  speedMul: 1.1,  colorIdx: 3 },
+      { yBase: 0.74, amp: 38, freqMul: 0.65, speedMul: 1.2,  colorIdx: 3 },
+      { yBase: 0.85, amp: 42, freqMul: 0.6,  speedMul: 1.35, colorIdx: 4 },
+    ];
 
-      // Sun / Moon
-      if (t < 0.3) {
-        sunMoon.style.background = '#ecf0f1';
-        sunMoon.style.boxShadow = '0 0 30px rgba(236,240,241,0.4)';
-      } else {
-        const sunT = (t - 0.3) / 0.7;
-        const glow = Math.round(lerp(50, 100, sunT));
-        sunMoon.style.background = `rgb(${255},${Math.round(lerp(200, 235, sunT))},${Math.round(lerp(50, 100, sunT))})`;
-        sunMoon.style.boxShadow = `0 0 ${30 + sunT * 40}px rgba(255,200,${glow},${0.4 + sunT * 0.4})`;
-      }
+    function calcWaveY(x, time, layer, wl, spd) {
+      const freq = (2 * Math.PI) / (wl * layer.freqMul);
+      const s = spd * layer.speedMul;
+      const phaseOffset = layer.yBase * 17;
+      let y = 0;
+      y += Math.sin(x * freq + time * s + phaseOffset) * layer.amp;
+      y += Math.sin(x * freq * 2.1 + time * s * 1.3 + phaseOffset + 1.5) * layer.amp * 0.3;
+      y += Math.sin(x * freq * 0.6 + time * s * 0.7 + phaseOffset + 3.0) * layer.amp * 0.5;
+      return y;
+    }
+
+    function drawSky(th, t, time) {
+      const grad = ctx.createLinearGradient(0, 0, 0, horizonY);
+      grad.addColorStop(0, rgb(th.skyTop));
+      grad.addColorStop(1, rgb(th.skyBot));
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, W, horizonY + 2);
 
       // Stars
-      starsEl.style.opacity = t < 0.4 ? 1 - t / 0.4 : 0;
+      if (t < 0.5) {
+        const a = t < 0.3 ? 1 : 1 - (t - 0.3) / 0.2;
+        for (const s of stars) {
+          ctx.globalAlpha = a * (0.4 + 0.6 * Math.sin(time * 1.2 + s.p));
+          ctx.fillStyle = '#fff';
+          ctx.beginPath();
+          ctx.arc(s.x * W, s.y * H, s.s, 0, 6.28);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+      }
 
-      // Controls panel
-      const isDark = t < 0.4;
-      controls.style.background = isDark
-        ? 'rgba(255,255,255,0.1)'
-        : 'rgba(0,0,0,0.15)';
-      controls.style.color = isDark ? '#ecf0f1' : '#2d3436';
+      // Sun/moon glow
+      const sx = W * 0.5, sy = horizonY * 0.35;
+      const grd = ctx.createRadialGradient(sx, sy, 10, sx, sy, 150);
+      grd.addColorStop(0, rgba(th.sunGlow, 0.5));
+      grd.addColorStop(0.5, rgba(th.sunGlow, 0.1));
+      grd.addColorStop(1, rgba(th.sunGlow, 0));
+      ctx.fillStyle = grd;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 150, 0, 6.28);
+      ctx.fill();
+
+      // Sun/moon disc
+      const dg = ctx.createRadialGradient(sx, sy, 0, sx, sy, 32);
+      dg.addColorStop(0, rgba(th.sunCol, 1));
+      dg.addColorStop(1, rgba(th.sunCol, 0.85));
+      ctx.fillStyle = dg;
+      ctx.beginPath();
+      ctx.arc(sx, sy, 32, 0, 6.28);
+      ctx.fill();
     }
 
-    speedInput.addEventListener('input', updateSpeed);
-    daytimeInput.addEventListener('input', updateDaytime);
-    wavelengthInput.addEventListener('input', () => {
-      wavelengthVal.textContent = wavelengthInput.value;
-      updateWaves();
-    });
+    function drawOcean(th, t, time, speed, wavelength) {
+      const oceanH = H - horizonY;
+      const step = 3;
 
-    updateWaves();
-    updateSpeed();
-    updateDaytime();
+      for (let li = 0; li < layers.length; li++) {
+        const L = layers[li];
+        const baseY = horizonY + oceanH * L.yBase;
+        const col = th.water[L.colorIdx];
+
+        // Darker shade for body below the crest
+        const bodyCol = lerpC(col, [0, 0, 0], 0.15);
+
+        // Draw wave shape
+        ctx.beginPath();
+        ctx.moveTo(-10, H + 10);
+        ctx.lineTo(-10, baseY);
+
+        const pts = [];
+        for (let x = -10; x <= W + 10; x += step) {
+          const wy = calcWaveY(x, time, L, wavelength, speed);
+          const py = baseY + wy;
+          pts.push({ x, y: py, wy });
+          ctx.lineTo(x, py);
+        }
+
+        ctx.lineTo(W + 10, H + 10);
+        ctx.closePath();
+
+        // Gradient fill from crest color to darker body
+        const grd = ctx.createLinearGradient(0, baseY - L.amp, 0, baseY + L.amp + oceanH * 0.15);
+        grd.addColorStop(0, rgb(col));
+        grd.addColorStop(0.4, rgb(col));
+        grd.addColorStop(1, rgb(bodyCol));
+        ctx.fillStyle = grd;
+        ctx.fill();
+
+        // Specular highlights on crests
+        for (let i = 1; i < pts.length - 1; i++) {
+          const p = pts[i];
+          const prev = pts[i - 1];
+          const next = pts[i + 1];
+
+          // Crest detection: point lower (higher on screen) than neighbors
+          if (p.wy < prev.wy && p.wy < next.wy && p.wy < -L.amp * 0.2) {
+            const intensity = Math.min(1, (-p.wy - L.amp * 0.2) / (L.amp * 0.6));
+            const highlightW = wavelength * 0.15;
+
+            const sg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, highlightW);
+            sg.addColorStop(0, rgba(th.spec, intensity * 0.35));
+            sg.addColorStop(1, rgba(th.spec, 0));
+            ctx.fillStyle = sg;
+            ctx.fillRect(p.x - highlightW, p.y - 3, highlightW * 2, 6);
+          }
+        }
+
+        // Foam on front layers
+        if (li >= 4) {
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(-10, H + 10);
+          ctx.lineTo(-10, baseY - L.amp);
+          for (const p of pts) ctx.lineTo(p.x, p.y);
+          ctx.lineTo(W + 10, H + 10);
+          ctx.closePath();
+          ctx.clip();
+
+          for (let i = 1; i < pts.length - 1; i++) {
+            const p = pts[i];
+            const slope = (pts[i + 1].wy - pts[i - 1].wy) / (step * 2);
+
+            // Foam on forward-facing slopes near crests
+            if (p.wy < -L.amp * 0.1 && slope > 0.05) {
+              const foamStr = Math.min(1, slope * 5) * Math.min(1, (-p.wy) / (L.amp * 0.4));
+              ctx.fillStyle = rgba(th.foam, foamStr * 0.5);
+              ctx.fillRect(p.x - 1, p.y - 1, step + 2, 4);
+            }
+
+            // Thin white line right at the crest
+            if (p.wy < pts[i - 1].wy && p.wy < pts[i + 1].wy && p.wy < -L.amp * 0.3) {
+              ctx.strokeStyle = rgba(th.foam, 0.6);
+              ctx.lineWidth = 1.5;
+              const startIdx = Math.max(0, i - 6);
+              const endIdx = Math.min(pts.length - 1, i + 6);
+              ctx.beginPath();
+              ctx.moveTo(pts[startIdx].x, pts[startIdx].y);
+              for (let j = startIdx + 1; j <= endIdx; j++) ctx.lineTo(pts[j].x, pts[j].y);
+              ctx.stroke();
+            }
+          }
+          ctx.restore();
+        }
+      }
+
+      // Sun reflection on water
+      const refX = W * 0.5;
+      const refLen = Math.min(oceanH * 0.6, 250);
+      for (let y = horizonY; y < horizonY + refLen; y += 2) {
+        const d = (y - horizonY) / refLen;
+        const shimmer = Math.sin(y * 0.12 + time * 2.5) * (10 + d * 20);
+        const w = 4 + d * 60;
+        const a = (1 - d) * (t < 0.2 ? 0.12 : 0.22);
+        ctx.fillStyle = rgba(th.spec, a);
+        ctx.fillRect(refX - w / 2 + shimmer, y, w, 2);
+      }
+    }
+
+    let time = 0;
+
+    function render() {
+      const speed = parseInt(document.getElementById('speed').value);
+      const daytime = parseInt(document.getElementById('daytime').value) / 100;
+      const wlVal = parseInt(document.getElementById('wavelength').value);
+      const wavelength = 80 + wlVal * 35;
+
+      document.getElementById('speedVal').textContent = speed;
+      document.getElementById('daytimeVal').textContent = (daytime * 100 | 0) + '%';
+      document.getElementById('wavelengthVal').textContent = wlVal;
+
+      const th = getTheme(daytime);
+
+      ctx.clearRect(0, 0, W, H);
+      drawSky(th, daytime, time);
+      drawOcean(th, daytime, time, speed * 0.5, wavelength);
+
+      const isDark = daytime < 0.4;
+      const ctrl = document.getElementById('controls');
+      ctrl.style.background = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.2)';
+      ctrl.style.color = '#ecf0f1';
+
+      time += 0.025;
+      requestAnimationFrame(render);
+    }
+
+    render();
   </script>
 </body>
 </html>
