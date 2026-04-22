@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sea Wave Simulator</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      overflow: hidden;
+      height: 100vh;
+      font-family: 'Segoe UI', sans-serif;
+      transition: background 1.5s ease;
+    }
+
+    .sky {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 55%;
+      transition: background 1.5s ease;
+    }
+
+    .sun-moon {
+      position: absolute;
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      top: 12%;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: background 1.5s ease, box-shadow 1.5s ease;
+    }
+
+    .stars {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 55%;
+      transition: opacity 1.5s ease;
+      pointer-events: none;
+    }
+
+    .star {
+      position: absolute;
+      background: #fff;
+      border-radius: 50%;
+      animation: twinkle 2s ease-in-out infinite alternate;
+    }
+
+    @keyframes twinkle {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+
+    .ocean {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 55%;
+      overflow: hidden;
+      transition: background 1.5s ease;
+    }
+
+    .wave {
+      position: absolute;
+      width: 200%;
+      left: -50%;
+      transition: background 1.5s ease;
+    }
+
+    .wave-back {
+      bottom: 10%;
+      height: 60%;
+      opacity: 0.6;
+      animation: wave-move-back linear infinite;
+    }
+
+    .wave-mid {
+      bottom: 5%;
+      height: 55%;
+      opacity: 0.8;
+      animation: wave-move-mid linear infinite;
+    }
+
+    .wave-front {
+      bottom: 0;
+      height: 50%;
+      animation: wave-move-front linear infinite;
+    }
+
+    @keyframes wave-move-back {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(25%); }
+    }
+
+    @keyframes wave-move-mid {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-25%); }
+    }
+
+    @keyframes wave-move-front {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(25%); }
+    }
+
+    .controls {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 20px 24px;
+      border-radius: 16px;
+      backdrop-filter: blur(12px);
+      z-index: 10;
+      min-width: 240px;
+      transition: background 1.5s ease, color 1.5s ease;
+    }
+
+    .controls h2 {
+      font-size: 16px;
+      margin-bottom: 16px;
+      letter-spacing: 0.5px;
+    }
+
+    .control-group {
+      margin-bottom: 14px;
+    }
+
+    .control-group label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .control-group label span {
+      opacity: 0.7;
+      font-weight: 400;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      outline: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.3);
+      cursor: pointer;
+    }
+
+    .speed-slider { background: linear-gradient(90deg, #74b9ff, #0984e3); }
+    .daytime-slider { background: linear-gradient(90deg, #2d3436, #fdcb6e, #0984e3); }
+    .wavelength-slider { background: linear-gradient(90deg, #55efc4, #00b894); }
+  </style>
+</head>
+<body>
+
+  <div class="sky" id="sky">
+    <div class="sun-moon" id="sunMoon"></div>
+    <div class="stars" id="stars"></div>
+  </div>
+
+  <div class="ocean" id="ocean">
+    <svg class="wave wave-back" id="waveBack" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path id="pathBack" fill="currentColor"></path>
+    </svg>
+    <svg class="wave wave-mid" id="waveMid" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path id="pathMid" fill="currentColor"></path>
+    </svg>
+    <svg class="wave wave-front" id="waveFront" viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path id="pathFront" fill="currentColor"></path>
+    </svg>
+  </div>
+
+  <div class="controls" id="controls">
+    <h2>Wave Controls</h2>
+
+    <div class="control-group">
+      <label>Speed <span id="speedVal">5</span></label>
+      <input type="range" class="speed-slider" id="speed" min="1" max="10" value="5">
+    </div>
+
+    <div class="control-group">
+      <label>Daytime <span id="daytimeVal">75%</span></label>
+      <input type="range" class="daytime-slider" id="daytime" min="0" max="100" value="75">
+    </div>
+
+    <div class="control-group">
+      <label>Wavelength <span id="wavelengthVal">5</span></label>
+      <input type="range" class="wavelength-slider" id="wavelength" min="2" max="12" value="5">
+    </div>
+  </div>
+
+  <script>
+    const speedInput = document.getElementById('speed');
+    const daytimeInput = document.getElementById('daytime');
+    const wavelengthInput = document.getElementById('wavelength');
+    const speedVal = document.getElementById('speedVal');
+    const daytimeVal = document.getElementById('daytimeVal');
+    const wavelengthVal = document.getElementById('wavelengthVal');
+
+    const sky = document.getElementById('sky');
+    const ocean = document.getElementById('ocean');
+    const sunMoon = document.getElementById('sunMoon');
+    const starsEl = document.getElementById('stars');
+    const controls = document.getElementById('controls');
+
+    const waveBack = document.getElementById('waveBack');
+    const waveMid = document.getElementById('waveMid');
+    const waveFront = document.getElementById('waveFront');
+
+    // Generate stars
+    for (let i = 0; i < 60; i++) {
+      const star = document.createElement('div');
+      star.className = 'star';
+      const size = Math.random() * 3 + 1;
+      star.style.width = size + 'px';
+      star.style.height = size + 'px';
+      star.style.left = Math.random() * 100 + '%';
+      star.style.top = Math.random() * 100 + '%';
+      star.style.animationDelay = Math.random() * 2 + 's';
+      starsEl.appendChild(star);
+    }
+
+    function generateWavePath(peaks) {
+      const segmentWidth = 1440 / peaks;
+      let d = 'M0,160';
+      for (let i = 0; i < peaks * 2; i++) {
+        const x = (i + 1) * (segmentWidth / 2);
+        const amp = 40 + Math.random() * 20;
+        const y = i % 2 === 0 ? 160 - amp : 160 + amp * 0.6;
+        const cpx = x - segmentWidth / 4;
+        const cpy = y;
+        d += ` Q${cpx},${cpy} ${x},${y}`;
+      }
+      d += ' L1440,320 L0,320 Z';
+      return d;
+    }
+
+    function updateWaves() {
+      const wl = parseInt(wavelengthInput.value);
+      const peaks = 14 - wl + 2;
+      document.getElementById('pathBack').setAttribute('d', generateWavePath(peaks));
+      document.getElementById('pathMid').setAttribute('d', generateWavePath(peaks));
+      document.getElementById('pathFront').setAttribute('d', generateWavePath(peaks));
+    }
+
+    function updateSpeed() {
+      const speed = parseInt(speedInput.value);
+      const duration = 12 - speed + 1;
+      waveBack.style.animationDuration = (duration * 1.3) + 's';
+      waveMid.style.animationDuration = duration + 's';
+      waveFront.style.animationDuration = (duration * 0.8) + 's';
+      speedVal.textContent = speed;
+    }
+
+    function lerp(a, b, t) {
+      return a + (b - a) * t;
+    }
+
+    function lerpColor(c1, c2, t) {
+      return [
+        Math.round(lerp(c1[0], c2[0], t)),
+        Math.round(lerp(c1[1], c2[1], t)),
+        Math.round(lerp(c1[2], c2[2], t))
+      ];
+    }
+
+    function rgb(c) { return `rgb(${c[0]},${c[1]},${c[2]})`; }
+
+    function updateDaytime() {
+      const val = parseInt(daytimeInput.value);
+      daytimeVal.textContent = val + '%';
+
+      // 0 = midnight, 50 = sunrise/sunset, 100 = noon
+      const t = val / 100;
+
+      const nightSky = [15, 20, 40];
+      const sunsetSky = [255, 118, 67];
+      const daySky = [116, 185, 255];
+
+      const nightOcean = [10, 15, 45];
+      const sunsetOcean = [44, 62, 80];
+      const dayOcean = [9, 132, 227];
+
+      const nightWaveBack = [20, 30, 70];
+      const sunsetWaveBack = [60, 80, 100];
+      const dayWaveBack = [30, 144, 255];
+
+      const nightWaveMid = [15, 25, 65];
+      const sunsetWaveMid = [50, 70, 95];
+      const dayWaveMid = [20, 120, 220];
+
+      const nightWaveFront = [10, 20, 55];
+      const sunsetWaveFront = [40, 60, 85];
+      const dayWaveFront = [14, 100, 200];
+
+      let skyColor, oceanColor, wbColor, wmColor, wfColor;
+
+      if (t < 0.35) {
+        const p = t / 0.35;
+        skyColor = lerpColor(nightSky, sunsetSky, p);
+        oceanColor = lerpColor(nightOcean, sunsetOcean, p);
+        wbColor = lerpColor(nightWaveBack, sunsetWaveBack, p);
+        wmColor = lerpColor(nightWaveMid, sunsetWaveMid, p);
+        wfColor = lerpColor(nightWaveFront, sunsetWaveFront, p);
+      } else {
+        const p = (t - 0.35) / 0.65;
+        skyColor = lerpColor(sunsetSky, daySky, p);
+        oceanColor = lerpColor(sunsetOcean, dayOcean, p);
+        wbColor = lerpColor(sunsetWaveBack, dayWaveBack, p);
+        wmColor = lerpColor(sunsetWaveMid, dayWaveMid, p);
+        wfColor = lerpColor(sunsetWaveFront, dayWaveFront, p);
+      }
+
+      sky.style.background = `linear-gradient(180deg, ${rgb(skyColor)}, ${rgb(lerpColor(skyColor, oceanColor, 0.3))})`;
+      ocean.style.background = rgb(oceanColor);
+
+      waveBack.style.color = rgb(wbColor);
+      waveMid.style.color = rgb(wmColor);
+      waveFront.style.color = rgb(wfColor);
+
+      // Sun / Moon
+      if (t < 0.3) {
+        sunMoon.style.background = '#ecf0f1';
+        sunMoon.style.boxShadow = '0 0 30px rgba(236,240,241,0.4)';
+      } else {
+        const sunT = (t - 0.3) / 0.7;
+        const glow = Math.round(lerp(50, 100, sunT));
+        sunMoon.style.background = `rgb(${255},${Math.round(lerp(200, 235, sunT))},${Math.round(lerp(50, 100, sunT))})`;
+        sunMoon.style.boxShadow = `0 0 ${30 + sunT * 40}px rgba(255,200,${glow},${0.4 + sunT * 0.4})`;
+      }
+
+      // Stars
+      starsEl.style.opacity = t < 0.4 ? 1 - t / 0.4 : 0;
+
+      // Controls panel
+      const isDark = t < 0.4;
+      controls.style.background = isDark
+        ? 'rgba(255,255,255,0.1)'
+        : 'rgba(0,0,0,0.15)';
+      controls.style.color = isDark ? '#ecf0f1' : '#2d3436';
+    }
+
+    speedInput.addEventListener('input', updateSpeed);
+    daytimeInput.addEventListener('input', updateDaytime);
+    wavelengthInput.addEventListener('input', () => {
+      wavelengthVal.textContent = wavelengthInput.value;
+      updateWaves();
+    });
+
+    updateWaves();
+    updateSpeed();
+    updateDaytime();
+  </script>
+</body>
+</html>
