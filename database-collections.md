@@ -96,7 +96,7 @@ Branch: `version/CIMB-tokenized-deposits-finalised` (67 collections — 63 from 
 | `burncashtokenrequests` | BurnCashTokenRequest | Cash token burn requests |
 | `allocationapprovals` | AllocationApproval | General allocation approval workflow |
 | `custodianallocationapprovals` | CustodianAllocationApproval | Custodian allocation approval (snapshot: `l1Payload.allocations[].bankAccountDetails`) |
-|<del>`custodianmanualallocapprovals` | CustodianManualAllocationApproval | Manual custodian allocation approval</del>|
+|<del>`custodianmanualallocapprovals` </del>|<del> CustodianManualAllocationApproval </del>| <del> Manual custodian allocation approval</del>|
 | `primarysubscriberallocapprovals` | PrimarySubscriberAllocationApproval | PS allocation approval |
 | `primarysubscribermanualallocapprovals` | PrimarySubscriberManualAllocationApproval | Manual PS allocation approval (snapshot: `manualAllocations[].bankAccountDetails`). **TD change**: added `allocationRequestId` ref per allocation |
 | `locapprovals` | LOCApproval | LOC approval workflow |
